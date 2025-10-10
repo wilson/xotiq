@@ -17,7 +17,7 @@ _(pronounced “exotic”)_
   * Enables cross-domain testing of quantum-classical boundary conditions.
 
 **3. Python Layer**
-* Parser + transpiler for QHDL → backend IRs.
+* Parser and transpiler for QHDL into backend IRs.
 * Integration via `asyncio` event loop for co-simulation between quantum and valleytronic time domains.
 * Optional visualization layer using `matplotlib` or `plotly` for spin-valley phase diagrams.
 
