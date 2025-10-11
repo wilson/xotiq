@@ -6,7 +6,6 @@ An HDL for designing and simulating energy-based, probabilistic hardware, to imp
 -----
 
 ### 1\. The Philosophy: Physical Intelligence
-
 `xotiq` is not an HDL for describing clocks and logic gates. It's a language for describing a **network of influences** that computes by physically settling into a low-energy state.
 
 This architecture is a direct hardware implementation of a **Stochastic Hopfield Network / Boltzmann Machine**. It provides a physical substrate for brain-inspired computing models like the **Free Energy Principle (FEP)**, where computation is a process of Bayesian inference via energy minimization.
@@ -31,8 +30,7 @@ connect C -> A with weight +0.5;
       * **`observe(p_node, duration)`:** Reads the resulting inference by measuring a node's time-averaged state after the network has settled.
 
 ### 3\. The Compiler Toolchain: From Language to Hardware
-
-The compiler translates a `xotiq` design into a "management regime" for a specific hardware target. The backend architecture is modular to support different stages of development.
+The compiler translates an `xotiq` design into a "management regime" for a specific hardware target. The backend architecture is modular to support different stages of development.
 
   * **Simulation Backend -\> Verilog-AMS:** For high-fidelity, mixed-signal simulation. This backend models the actual analog physics of the components, allowing for accurate verification of the energy-based dynamics.
   * **Emulation Backend -\> SystemVerilog:** For purely digital emulation on standard FPGAs. This backend replaces the analog physics with a PRNG (e.g., an LFSR) and digital comparators, enabling rapid testing of the network's logic on hardware like the iCE40.
@@ -40,16 +38,13 @@ The compiler translates a `xotiq` design into a "management regime" for a specif
 
 
 ### 4\. The Python
-
 A Python-based suite serves as the compiler frontend and orchestration layer.
-
   * Parses `xotiq` code into a hardware-agnostic Intermediate Representation (IR).
   * Drives the selected backend to generate the target output (Verilog-AMS, SystemVerilog, etc.).
   * Manages the physical hardware interface for programming and running the FPGA+FPAA prototype.
   * Provides visualization tools (`matplotlib`, `plotly`) for analyzing energy landscapes and system state distributions.
 
 ### 5\. Future Directions
-
   * Formalize the IR into a true **Hardware Abstraction Layer (HAL)**, allowing new hardware backends to be added easily.
   * Develop a high-performance physical backend that emits **SPI commands or memory-mapped I/O** to manage a future custom photonic or spintronic chip.
   * Implement a **JAX/NumPyro backend**. This would enable powerful, gradient-based optimization of the network's physical weights (the J-matrix) directly from high-level problem descriptions.
