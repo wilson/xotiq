@@ -5,7 +5,7 @@
 
 `xotiq` is a language for designing systems where **deterministic control** (digital logic) interacts directly with **probabilistic physics** (analog dynamics).
 
-It provides a unified abstraction for the emerging class of "post-Moore" accelerators—whether photonic, spintronic, or thermodynamically-driven—allowing engineers to describe computation as a process of energy minimization and physical settling, rather than just boolean switching.
+It provides a unified abstraction for the emerging class of "post-Moore" accelerators (whether photonic, spintronic, or thermodynamically-driven) allowing engineers to describe computation as a process of energy minimization and physical settling, rather than just boolean switching.
 
 ---
 
