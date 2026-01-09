@@ -126,7 +126,8 @@ Core development focuses on the **Intermediate Representation (IR)** and the **Z
 
 ### Foundations
 
-* [Simulating Physics with Computers](https://link.springer.com/article/10.1007/BF02650179) (1981)> Richard Feynman. The foundational argument for why nature cannot be efficiently simulated by classical boolean logic.
+* [Simulating Physics with Computers](https://link.springer.com/article/10.1007/BF02650179) (1981)
+> Richard Feynman. The foundational argument for why nature cannot be efficiently simulated by classical boolean logic.
 
 * [Minds, Brains, and Programs](https://home.csulb.edu/~cwallis/382/readings/482/searle.minds.brains.programs.bbs.1980.pdf) (1980)
 > Crucial for understanding the distinction between *syntactic* manipulation (traditional computing) and *semantic* understanding (physical settling).
