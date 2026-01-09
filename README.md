@@ -81,19 +81,19 @@ d_node Controller {
 The `xotiq` toolchain uses a multi-stage lowering strategy to target increasing levels of physical realism.
 
 * **Target: Digital Emulation (CPU/FPGA)**
-* **Output:** SystemVerilog / C++. / etc.
-* **Method:** `p_nodes` are lowered to pseudo-random number generators and digital accumulators. Allows for rapid algorithm verification on standard hardware.
+    * **Output:** SystemVerilog / C++. / etc.
+    * **Method:** `p_nodes` are lowered to pseudo-random number generators and digital accumulators. Allows for rapid algorithm verification on standard hardware.
 
 * **Target: Analog Synthesis (FPAA/ASIC)**
-* **Output:** SPICE Netlist.
-* **Method:** `p_nodes` map to op-amp summing junctions or resistor networks; `d_nodes` map to standard voltage-mode logic.
+    * **Output:** SPICE Netlist.
+    * **Method:** `p_nodes` map to op-amp summing junctions or resistor networks; `d_nodes` map to standard voltage-mode logic.
 
 * **Target: Integrated Photonics**
-* **Output:** GDSII / Circuit Simulation Interconnects.
-* **Method:**
-* **WDM Support:** Topological links are assigned specific wavelengths ("colors"), enabling massive parallelism on single waveguides.
-* **Non-Linearity:** `d_node` logic is synthesized as resonator/SOA structures for signal restoration.
-* **Interference:** `p_node` meshes are synthesized as passive optical linear units.
+    * **Output:** GDSII / Circuit Simulation Interconnects.
+    * **Method:**
+    * **WDM Support:** Topological links are assigned specific wavelengths ("colors"), enabling massive parallelism on single waveguides.
+    * **Non-Linearity:** `d_node` logic is synthesized as resonator/SOA structures for signal restoration.
+    * **Interference:** `p_node` meshes are synthesized as passive optical linear units.
 
 ---
 
