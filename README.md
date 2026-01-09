@@ -46,31 +46,43 @@ Computation is defined by the interaction between these domains:
 * **`clamp(node, value)`:** The Digital domain forces a Physical node to a specific state (e.g., applying a voltage bias, tuning a laser input).
 * **`observe(node)`:** The Digital domain reads the settled state of the Physical fabric (e.g., ADC, Photodetector).
 
-```rust
-// Example: A Hybrid Optical Logic Gate
+Zig "SDK" example code:
+```zig
+// A Hybrid Optical Logic Gate
+const std = @import("std");
+const xq = @import("xotiq");
 
-// 1. The Fabric (p_nodes)
-// A passive mesh of waveguides and couplers.
+// The Fabric (p_nodes)
+// A passive mesh of waveguides and couplers defined at compile-time.
 // In a photonic backend, this compiles to an interferometer mesh.
-p_node A, B, Output;
-link A <-> Output { weight: -1.0 }; // Destructive interference
-link B <-> Output { weight: -1.0 }; 
+const XOR_Topology = struct {
+    A: xq.Node,
+    B: xq.Node,
+    Output: xq.Node,
 
-// 2. The Control (d_nodes)
+    // Define the physics: Destructive interference
+    pub const links = .{
+        .{ .src = .A, .dst = .Output, .weight = -1.0 },
+        .{ .src = .B, .dst = .Output, .weight = -1.0 },
+    };
+};
+
+// The Control (d_nodes)
 // The "Active" components that drive the laser and read the result.
-d_node Controller {
-    process {
-        // "Clamp" inputs (Inject Coherent Light)
-        clamp(A, 1.0);
-        clamp(B, 0.0);
-        
-        // Wait for light to propagate through the mesh
-        wait(10.ps);
-        
-        // "Observe" the result (Read the Photodetector)
-        // This implicitly handles the analog-to-digital thresholding
-        let result = observe(Output);
-    }
+pub fn main() !void {
+    // Synthesize the fabric
+    var chip = try xq.synthesize(XOR_Topology);
+
+    // "Clamp" inputs (Inject Coherent Light)
+    chip.clamp(.A, 1.0);
+    chip.clamp(.B, 0.0);
+
+    // Wait for light to propagate (Physics happens here)
+    chip.wait(10 * xq.ps);
+
+    // "Observe" the result (Read the Photodetector)
+    // Implicitly handles analog-to-digital thresholding
+    const result = chip.observe(.Output);
 }
 ```
 
