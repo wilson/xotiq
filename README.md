@@ -25,7 +25,7 @@ Current tools force a choice:
 
 `xotiq` designs are "bipartite graphs". The compiler manages the impedance mismatch between two distinct domains of computing:
 
-### **1. The Deterministic Domain (`d_node`)**
+### **The Deterministic Domain (`d_node`)**
 * **Role:** The "Controller." Handles sequential logic, state machines, I/O, and data routing.
 * **Behavior:** Classical, restorative, non-linear.
 * **Physical Realization:**
@@ -33,7 +33,7 @@ Current tools force a choice:
     * **Photonic Resonators:** Microring resonators or saturable absorbers that "clamp" signals to binary states.
     * **Spintronics:** Stable, high-barrier magnetic junctions.
 
-### **2. The Probabilistic Domain (`p_node`)**
+### **The Probabilistic Domain (`p_node`)**
 * **Role:** The "Fabric." Handles pattern matching, optimization, and massive parallelism via physics.
 * **Behavior:** Continuous, interferometric, energy-based.
 * **Physical Realization:**
@@ -105,6 +105,48 @@ Core development focuses on the **Intermediate Representation (IR)** and the **Z
 * **Logic Designers:** Help define standard libraries for probabilistic arithmetic.
 * **Physicists:** Help refine the backend models for specific photonic and spintronic constraints.
 * **Compiler Engineers:** Help optimize the lowering passes for hybrid FPGA/ASIC targets.
+
+---
+
+## Inspirations & Further Reading
+
+`xotiq` is synthesizing concepts from quantum mechanics, thermodynamics, and high-performance computing.
+
+### Foundations
+
+* **Simulating Physics with Computers** – *Richard Feynman (1981)*
+	* The foundational argument for why nature cannot be efficiently simulated by classical boolean logic.
+
+* **Minds, Brains, and Programs** – *John R. Searle (1980)*
+	* Crucial for understanding the distinction between *syntactic* manipulation (traditional computing) and *semantic* understanding (physical settling).
+
+### **Architecture & Hardware**
+
+* **Extropic: An Efficient Probabilistic Hardware Architecture for Diffusion-like Models** – *2510.23972*
+	* Demonstrates the viability of energy-based probabilistic hardware for modern AI workloads.
+
+* **Massively Parallel Probabilistic Computing with Sparse Ising Machines** – *2110.02481*
+	* Validates the "Ising Machine" approach (a core `p_node` behavior) for solving combinatorial optimization.
+
+* **Anatomy of High-Performance Matrix Multiplication** – *Kazushige Goto (2008)*
+	* The "Bible" of classical matrix math optimization; a reminder of the deterministic bottlenecks we aim to bypass.
+
+* **Field Free Spin-Orbit Torque Controlled Neuron Devices for Spintronic Boltzmann Neural Networks** – *2510.05616*
+	* A direct physical candidate for the spintronic implementation of `p_nodes`.
+
+### **Theory & Logic**
+
+* **Information Physics of Intelligence: Unifying Logical Depth and Entropy under Thermodynamic Constraints** – *2511.19156*
+	* Provides the thermodynamic framework for treating computation as energy minimization.
+
+* **Computing with Time: Microarchitectural Weird Machines** – *CACM (2024)*
+	* Explores the use of analog timing and "settling" as a computational primitive, directly relevant to `xotiq`'s `wait()` and `observe()` semantics.
+
+* **Inconsistency Robustness in Logic Programming** – *0904.3036*
+	* Essential reading for designing control logic (`d_nodes`) that can tolerate the inherent noise of physical fabrics.
+
+* **Spacetime Hopfions from Skyrmion Braiding** – *s42005-024-01628-3*
+	* Because sometimes, state is just topology.
 
 ---
 *© 02026 Wilson Bilkovich*
