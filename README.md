@@ -120,45 +120,47 @@ Core development focuses on the **Intermediate Representation (IR)** and the **Z
 
 ---
 
-## Inspirations & Further Reading
+## Inspiration & Citations
 
 `xotiq` is synthesizing concepts from quantum mechanics, thermodynamics, and high-performance computing.
 
 ### Foundations
 
-* **Simulating Physics with Computers** – *Richard Feynman (1981)*
-	* The foundational argument for why nature cannot be efficiently simulated by classical boolean logic.
+* [Simulating Physics with Computers](https://link.springer.com/article/10.1007/BF02650179) (1981)> Richard Feynman. The foundational argument for why nature cannot be efficiently simulated by classical boolean logic.
 
-* **Minds, Brains, and Programs** – *John R. Searle (1980)*
-	* Crucial for understanding the distinction between *syntactic* manipulation (traditional computing) and *semantic* understanding (physical settling).
+* [Minds, Brains, and Programs](https://home.csulb.edu/~cwallis/382/readings/482/searle.minds.brains.programs.bbs.1980.pdf) (1980)
+> Crucial for understanding the distinction between *syntactic* manipulation (traditional computing) and *semantic* understanding (physical settling).
 
 ### **Architecture & Hardware**
 
-* **Extropic: An Efficient Probabilistic Hardware Architecture for Diffusion-like Models** – *2510.23972*
-	* Demonstrates the viability of energy-based probabilistic hardware for modern AI workloads.
+* [All-Optical Digital Computing Using a Single All-Optical Gate Type](https://arxiv.org/abs/2403.00045) (2024)
+> The architectural proof-of-concept from Akhetonics, demonstrating how non-linear optical gates (SOAs) can form the universal "NAND/NOR" logic required for deterministic control.
 
-* **Massively Parallel Probabilistic Computing with Sparse Ising Machines** – *2110.02481*
-	* Validates the "Ising Machine" approach (a core `p_node` behavior) for solving combinatorial optimization.
+* [Extropic: An Efficient Probabilistic Hardware Architecture for Diffusion-like Models](https://arxiv.org/abs/2510.23972) (2025)
+> Demonstrates the viability of energy-based probabilistic hardware for modern AI workloads.
 
-* **Anatomy of High-Performance Matrix Multiplication** – *Kazushige Goto (2008)*
-	* The "Bible" of classical matrix math optimization; a reminder of the deterministic bottlenecks we aim to bypass.
+* [Massively Parallel Probabilistic Computing with Sparse Ising Machines](https://arxiv.org/abs/2110.02481) (2021)
+> Validates the "Ising Machine" approach (a core `p_node` behavior) for solving combinatorial optimization.
 
-* **Field Free Spin-Orbit Torque Controlled Neuron Devices for Spintronic Boltzmann Neural Networks** – *2510.05616*
-	* A direct physical candidate for the spintronic implementation of `p_nodes`.
+* [Anatomy of High-Performance Matrix Multiplication](https://dl.acm.org/doi/10.1145/1356052.1356053) (2008)
+> The "Bible" of classical matrix math optimization; a reminder of the deterministic bottlenecks we aim to bypass.
+
+* [Field Free Spin-Orbit Torque Controlled Neuron Devices for Spintronic Boltzmann Neural Networks](https://arxiv.org/abs/2510.05616) (2025)
+> A direct physical candidate for the spintronic implementation of `p_nodes`.
 
 ### **Theory & Logic**
 
-* **Information Physics of Intelligence: Unifying Logical Depth and Entropy under Thermodynamic Constraints** – *2511.19156*
-	* Provides the thermodynamic framework for treating computation as energy minimization.
+* [Information Physics of Intelligence: Unifying Logical Depth and Entropy under Thermodynamic Constraints](https://arxiv.org/abs/2511.19156) (2025)
+> Provides the thermodynamic framework for treating computation as energy minimization.
 
-* **Computing with Time: Microarchitectural Weird Machines** – *CACM (2024)*
-	* Explores the use of analog timing and "settling" as a computational primitive, directly relevant to `xotiq`'s `wait()` and `observe()` semantics.
+* [Computing with Time: Microarchitectural Weird Machines](https://dl.acm.org/doi/10.1145/3610722)  (2024)
+> Explores the use of analog timing and "settling" as a computational primitive, directly relevant to `xotiq`'s `wait()` and `observe()` semantics.
 
-* **Inconsistency Robustness in Logic Programming** – *0904.3036*
-	* Essential reading for designing control logic (`d_nodes`) that can tolerate the inherent noise of physical fabrics.
+* [Inconsistency Robustness in Logic Programming](https://arxiv.org/abs/0904.3036) (2009)
+> Essential reading for designing control logic (`d_nodes`) that can tolerate the inherent noise of physical fabrics.
 
-* **Spacetime Hopfions from Skyrmion Braiding** – *s42005-024-01628-3*
-	* Because sometimes, state is just topology.
+* [Spacetime Hopfions from Skyrmion Braiding](https://arxiv.org/abs/2305.07589) (2023)
+> Sometimes, (maybe always?), state is just topology.
 
 ---
 *© 02026 Wilson Bilkovich*
