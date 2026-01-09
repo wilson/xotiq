@@ -1,84 +1,110 @@
-### **xotiq**
-*(pronounced “exotic”)*
+# **xotiq**
+*(pronounced "exotic")*
 
-A hardware description language for designing and simulating energy-based, probabilistic hardware.
-Designed to implement the *Dirac Dataflow Architecture*.
+**The Hardware Description Language for Hybrid Physics-Based Computing.**
 
------
+`xotiq` is a language for designing systems where **deterministic control** (digital logic) interacts directly with **probabilistic physics** (analog dynamics).
 
-### 1\. The Philosophy: Automated "Right Action"
+It provides a unified abstraction for the emerging class of "post-Moore" accelerators—whether photonic, spintronic, or thermodynamically-driven—allowing engineers to describe computation as a process of energy minimization and physical settling, rather than just boolean switching.
 
-`xotiq` is not an HDL for describing clocks and logic gates.
-It's a language for describing a **network of influences** that computes by physically settling into a low-energy state within nanoseconds.
-This architecture is explicitly designed as a **non-cryogenic, short-coherence-time accelerator**.
+---
 
-This system is a direct hardware implementation of a **Stochastic Hopfield Network / Boltzmann Machine**.
-It provides a physical substrate for brain-inspired models like the **Free Energy Principle (FEP)**, where computation is a process of Bayesian inference via energy minimization.
-The goal is not to compete with general-purpose quantum computers, but to solve specific optimization and inference problems with unprecedented speed and efficiency at room temperature.
+## The Problem: The "Digital-Analog" Gap
 
------
+Modern frontier hardware is hybrid. We are building chips that combine standard digital logic with "exotic" physical substrates (photonic meshes, magnetic tunnel junctions, valleytronic gates) to solve optimization and inference problems.
 
-### 2\. The Language: A Hybrid Approach
+Current tools force a choice:
+* **Verilog/VHDL:** Perfect for the digital control logic, but cannot model the continuous physics of the accelerator fabric.
+* **SPICE/Multiphysics:** Perfect for the physics, but cannot model the complex state machines required to drive them.
 
-`xotiq` is a hybrid language that separates the computational fabric from its controller.
+`xotiq` bridges this gap. It treats the physical fabric not as a "black box" peripheral, but as a first-class citizen in the logic graph, managed by a compiler that understands both **clamping** (control) and **settling** (inference).
 
-  * **Probabilistic Fabric (Declarative):** The core of the design is a graph of `p_node`s (stochastic neurons) whose states are represented by a **quantized probability axis** (e.g., 10-bit precision). You define the network's "knowledge"—the energy landscape—using a declarative syntax for weighted connections (the J-matrix).
+---
 
-    ```
-    // Declare probabilistic nodes
-    p_node A, B, C;
+## The Abstraction
 
-    // Define the J-matrix of influences
-    connect A -> B with weight -1.0;
-    connect C -> A with weight +0.5;
-    ```
+`xotiq` designs are "bipartite graphs". The compiler manages the impedance mismatch between two distinct domains of computing:
 
-  * **Deterministic Control (Imperative):** The `p_node` fabric is managed by traditional, deterministic logic built from `d_node`s. This logic acts as the "investigator running the experiment," using special commands to interact with the fabric:
+### **1. The Deterministic Domain (`d_node`)**
+* **Role:** The "Controller." Handles sequential logic, state machines, I/O, and data routing.
+* **Behavior:** Classical, restorative, non-linear.
+* **Physical Realization:**
+    * Standard CMOS Logic (Gates, FSMs).
+    * **Photonic Resonators:** Microring resonators or saturable absorbers that "clamp" signals to binary states.
+    * **Spintronics:** Stable, high-barrier magnetic junctions.
 
-      * **`clamp(p_node, probability)`:** Provides sensory input by using local **electrical gates** to force a node's state.
-      * **`observe(p_node, duration)`:** Reads the resulting inference by measuring a node's time-averaged state after the network has settled.
+### **2. The Probabilistic Domain (`p_node`)**
+* **Role:** The "Fabric." Handles pattern matching, optimization, and massive parallelism via physics.
+* **Behavior:** Continuous, interferometric, energy-based.
+* **Physical Realization:**
+    * **Photonic Meshes:** Mach-Zehnder Interferometer arrays doing passive matrix math at the speed of light.
+    * **Stochastic Logic:** PRNG-driven digital fabrics.
+    * **Nanomagnetism:** Superparamagnetic islands interacting via dipole coupling.
 
------
+### **The Bridge**
+Computation is defined by the interaction between these domains:
+* **`clamp(node, value)`:** The Digital domain forces a Physical node to a specific state (e.g., applying a voltage bias, tuning a laser input).
+* **`observe(node)`:** The Digital domain reads the settled state of the Physical fabric (e.g., ADC, Photodetector).
 
-### 3\. The Compiler Toolchain: Multi-Tiered Simulation  
+```rust
+// Example: A Hybrid Optical Logic Gate
 
-The compiler's design is modular, enabled by a hardware-agnostic Intermediate Representation (IR). This allows `xotiq` to target a range of backends that represent a **path of increasing physical realism**, from high-level logic emulation to deep physics modeling.
+// 1. The Fabric (p_nodes)
+// A passive mesh of waveguides and couplers.
+// In a photonic backend, this compiles to an interferometer mesh.
+p_node A, B, Output;
+link A <-> Output { weight: -1.0 }; // Destructive interference
+link B <-> Output { weight: -1.0 }; 
 
-#### Tier 1: Digital Emulation (Logic & Algorithm Verification)
+// 2. The Control (d_nodes)
+// The "Active" components that drive the laser and read the result.
+d_node Controller {
+    process {
+        // "Clamp" inputs (Inject Coherent Light)
+        clamp(A, 1.0);
+        clamp(B, 0.0);
+        
+        // Wait for light to propagate through the mesh
+        wait(10.ps);
+        
+        // "Observe" the result (Read the Photodetector)
+        // This implicitly handles the analog-to-digital thresholding
+        let result = observe(Output);
+    }
+}
+```
 
-  * **Backend:** `xotiq` -\> **SystemVerilog**
-  * **Purpose:** Generates a **digital** model using PRNGs to enable rapid testing of network logic and algorithms on any standard FPGA (e.g., iCE40).
+---
 
-#### Tier 2: Analog Circuit Simulation (Prototype Verification)
+## Compiler Backends
 
-  * **Backend:** `xotiq` -\> **SPICE Netlist** (compatible with **Xyce**, LTspice, etc.)
-  * **Purpose:** This is the crucial step for verifying the FPAA hardware prototype. This backend translates the `xotiq` design into a standard SPICE netlist, enabling high-fidelity simulation of the **analog circuit dynamics**: modeling the real behavior of the op-amps, rheostats, and their interconnections. While Verilog-AMS is also a powerful tool for this, targeting a standard SPICE netlist makes the toolchain more versatile.
+The `xotiq` toolchain uses a multi-stage lowering strategy to target increasing levels of physical realism.
 
-#### Tier 3: Device Physics Simulation (Future Hardware Design)
+* **Target: Digital Emulation (CPU/FPGA)**
+* **Output:** SystemVerilog / C++. / etc.
+* **Method:** `p_nodes` are lowered to pseudo-random number generators and digital accumulators. Allows for rapid algorithm verification on standard hardware.
 
-  * **Backend:** `xotiq` -\> **COMSOL / Lumerical Model**
-  * **Purpose:** The ultimate simulation target for designing the final, custom hardware. This backend translates the `xotiq` design into a full multiphysics model to simulate the fundamental physics of the **p-nodes** themselves (e.g., the valleytronics in graphene), allowing for the design and validation of the components that will eventually replace the FPAA prototype.
+* **Target: Analog Synthesis (FPAA/ASIC)**
+* **Output:** SPICE Netlist.
+* **Method:** `p_nodes` map to op-amp summing junctions or resistor networks; `d_nodes` map to standard voltage-mode logic.
 
-#### Synthesis & Prototype
+* **Target: Integrated Photonics**
+* **Output:** GDSII / Circuit Simulation Interconnects.
+* **Method:**
+* **WDM Support:** Topological links are assigned specific wavelengths ("colors"), enabling massive parallelism on single waveguides.
+* **Non-Linearity:** `d_node` logic is synthesized as resonator/SOA structures for signal restoration.
+* **Interference:** `p_node` meshes are synthesized as passive optical linear units.
 
-  * **Physical Prototype:** `xotiq` -\> **Verilog + I²C Script**. Generates the hybrid code for the initial hardware: a Verilog FSM for the FPGA controller and the I²C command stream to configure the FPAA analog fabric.
-  * **Future Device Synthesis:** This will take a verified design and generate the full "management regime" (e.g., SPI commands, memory-mapped I/O) required to run on a real, custom-designed chip.
+---
 
------
+## Contributing
 
-### 4\. The Python Host
+`xotiq` is an open effort to build the standard infrastructure for post-Von-Neumann computing.
+Core development focuses on the **Intermediate Representation (IR)** and the **Zig-based reference compiler**.
 
-Python initially serves as the compiler frontend and orchestration layer.
+* **Logic Designers:** Help define standard libraries for probabilistic arithmetic.
+* **Physicists:** Help refine the backend models for specific photonic and spintronic constraints.
+* **Compiler Engineers:** Help optimize the lowering passes for hybrid FPGA/ASIC targets.
 
-  * Parses `xotiq` code into a hardware-agnostic Intermediate Representation (IR).
-  * Drives the selected backend to generate the target output (Verilog, Xyce netlist, etc.).
-  * Manages the physical hardware interface for programming and running the FPGA+FPAA prototype.
-  * Provides visualization tools (`matplotlib`, `plotly`) for analyzing energy landscapes and system state distributions.
-
------
-
-### 5\. Future Directions
-
-  * **Formalize the IR into a true Hardware Abstraction Layer (HAL):** This makes the compiler fully retargetable, creating a stable interface between the language frontend and the growing list of backends.
-  * **Create a Device Synthesis Backend:** This takes a verified design and generates the full "management regime" (e.g., SPI commands, memory-mapped I/O configs) required to run on a final, custom-designed spintronic or valleytronic chip.
-  * **Implement a JAX/NumPyro Backend:** This should enable powerful, gradient-based optimization and training of the network's physical weights (the J-matrix) directly from high-level problem descriptions.
+---
+*© 02026 Wilson Bilkovich*
