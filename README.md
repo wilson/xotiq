@@ -1,167 +1,161 @@
 # **xotiq**
-*(pronounced "exotic")*
 
-**The Hardware Description Language for Hybrid Physics-Based Computing.**
+> (pronounced "exotic")
 
-`xotiq` is a language for designing systems where **deterministic control** (digital logic) interacts directly with **probabilistic physics** (analog dynamics).
+**The Synthesis Toolchain for Clockless and Reversible Computing.**
 
-It provides a unified abstraction for the emerging class of "post-Moore" accelerators (whether photonic, spintronic, or thermodynamically-driven) allowing engineers to describe computation as a process of energy minimization and physical settling, rather than just boolean switching.
+`xotiq` is an open-source Hardware Description Language (HDL) and compiler infrastructure for the post-von-Neumann omputing era.
 
----
+Traditional HDLs (Verilog, VHDL) are built on the foundational assumptions of **synchronous clocks** and **irreversible logic** (gates that destroy information and dissipate heat, hitting the thermal wall of Landauer's limit). `xotiq` abandons this entirely. It is designed specifically for emerging physical substrates—such as **All-Optical Photonics** and **Superconducting Fluxonics**—where computation is treated as the continuous, ballistic flight of discrete energy quanta.
 
-## The Problem: The "Digital-Analog" Gap
+In `xotiq`, there are no global clocks, no `wait` states, and no data destruction. Information has primacy, logic is topological, and computation is thermodynamically reversible.
 
-Modern frontier hardware is hybrid. We are building chips that combine standard digital logic with "exotic" physical substrates (photonic meshes, magnetic tunnel junctions, valleytronic gates) to solve optimization and inference problems.
+-----
 
-Current tools force a choice:
-* **Verilog/VHDL:** Perfect for the digital control logic, but cannot model the continuous physics of the accelerator fabric.
-* **SPICE/Multiphysics:** Perfect for the physics, but cannot model the complex state machines required to drive them.
+## The Shift: Space *is* Time
 
-`xotiq` bridges this gap. It treats the physical fabric not as a "black box" peripheral, but as a first-class citizen in the logic graph, managed by a compiler that understands both **clamping** (control) and **settling** (inference).
+Recent hardware breakthroughs have revealed that moving data (parasitic capacitance, electro-optical conversions, clock trees) costs exponentially-more energy than performing computations on it.  
 
----
+The solution is **Ballistic Reversible Computing**.
+  * **Ballistic:** Data representations (Photons, Magnetic Fluxons) propagate through logic elements without losing energy or requiring restoration.
+  * **Clockless (Time-of-Flight):** Time is replaced by Space. "Cycles" are dictated purely by time-of-flight (e.g., the length of a Silicon Nitride waveguide or a Long Josephson Junction). Synchronization is achieved via physical path length.
+  * **Reversible:** To push energy efficiency past Landauer's Limit ($E \ge k_B T \ln 2$), no information can be erased. `xotiq` enforces logical reversibility—every gate's outputs must map bijectively back to its inputs. Old state is physically ejected and recycled, not overwritten.
 
-## The Abstraction
+`xotiq` provides the Intermediate Representation (IR) to describe, route, and synthesize these zero-dissipation, continuous-flow topologies.
 
-`xotiq` designs are "bipartite graphs". The compiler manages the impedance mismatch between two distinct domains of computing:
+-----
 
-### **The Deterministic Domain (`d_node`)**
-* **Role:** The "Controller." Handles sequential logic, state machines, I/O, and data routing.
-* **Behavior:** Classical, restorative, non-linear.
-* **Physical Realization:**
-    * Standard CMOS Logic (Gates, FSMs).
-    * **Photonic Resonators:** Microring resonators or saturable absorbers that "clamp" signals to binary states.
-    * **Spintronics:** Stable, high-barrier magnetic junctions.
+## The Abstraction: Spatiotemporal Graphs
 
-### **The Probabilistic Domain (`p_node`)**
-* **Role:** The "Fabric." Handles pattern matching, optimization, and massive parallelism via physics.
-* **Behavior:** Continuous, interferometric, energy-based.
-* **Physical Realization:**
-    * **Photonic Meshes:** Mach-Zehnder Interferometer arrays doing passive matrix math at the speed of light.
-    * **Stochastic Logic:** PRNG-driven digital fabrics.
-    * **Nanomagnetism:** Superparamagnetic islands interacting via dipole coupling.
+With `xotiq`, we do not write sequential state machines. Instead we construct **Information-Conserving Flow Graphs**. The compiler's primary job is to automatically route paths so that ballistic quanta arrive at interaction points simultaneously, and to enforce reversibility.
 
-### **The Bridge**
-Computation is defined by the interaction between these domains:
-* **`clamp(node, value)`:** The Digital domain forces a Physical node to a specific state (e.g., applying a voltage bias, tuning a laser input).
-* **`observe(node)`:** The Digital domain reads the settled state of the Physical fabric (e.g., ADC, Photodetector).
+### 1\. Flight Paths (`f_node`)
 
-Zig "SDK" example code:
+  * **Role:** The Interconnects. They dictate both routing and timing.
+  * **Compiler Action:** **Delay Matching.** In a clockless system, if Quanta A and Quanta B must interact, they must arrive at the same picosecond. `xotiq` automatically calculates propagation speeds ($c$ in waveguides, fluxon speed in Long Josephson Junctions) and generates exact spatial routing lengths to mathematically guarantee simultaneous time-of-flight arrivals.
+
+### 2\. Reversible Barriers (`r_node`)
+
+  * **Role:** The Logic. Active, non-linear interactions that alter the path of quanta without absorbing or destroying their kinetic energy.
+  * **Compiler Action:** **Reversibility Enforcement.** To prevent heat dissipation, the compiler automatically maps standard logic into reversible equivalents, utilizing **Polarity Filters**, **Optical Crossbars**, and **Delay Loops** (to safely eject and recycle previous states rather than overwriting them).
+
+### 3\. Quanta Injection (`inject`)
+
+  * Computation is triggered by releasing energy into the fabric. The system proceeds deterministically, based entirely o the graph's physical geometry.
+
+-----
+
+## Code Example (Zig SDK)
+
+Here we define a reversible, asynchronous `AND` Gate. This example synthesizes the architecture from **Sandia Patent US12620993B1**. There are no clocks, variables, or destructive overrides.
+
 ```zig
-// A Hybrid Optical Logic Gate
 const std = @import("std");
 const xq = @import("xotiq");
 
-// The Fabric (p_nodes)
-// A passive mesh of waveguides and couplers defined at compile-time.
-// In a photonic backend, this compiles to an interferometer mesh.
-const XOR_Topology = struct {
-    A: xq.Node,
-    B: xq.Node,
-    Output: xq.Node,
+// A Ballistic, Asynchronous Reversible Switch Gate
+// Synthesizes to either Superconducting LJJs or Photonic Waveguides
+pub const AsyncSwitchGate = struct {
+    // Ballistic Terminals: Discrete Quanta (Fluxons or Photons)
+    control_in: xq.Port(.in),
+    data_in: xq.Port(.in),
 
-    // Define the physics: Destructive interference
-    pub const links = .{
-        .{ .src = .A, .dst = .Output, .weight = -1.0 },
-        .{ .src = .B, .dst = .Output, .weight = -1.0 },
+    // Reversible Outputs: To evade Landauer's limit, no data is destroyed.
+    // Unused or reflected quanta must be cleanly routed to conserve energy.
+    control_out:      xq.Port(.out), // Pass-through control (preserves injected energy)
+    data_out:         xq.Port(.out), // Evaluated data
+    compensation_out: xq.Port(.out), // Reflected "Garbage" output (preserves Boolean state)
+
+    pub const topology = .{
+        // Internal Physical Primitives
+        .polarity_in   = xq.nodes.PolaritySeparator(),
+        .polarity_out  = xq.nodes.PolaritySeparator(),
+        .circulator    = xq.nodes.Circulator(),
+        .barrier = xq.nodes.ControlledBarrier(),
+
+        // The compiler strictly enforces topological conservation.
+        // Paths must be explicitly defined, and flight times are delay-matched automatically.
+
+        // Control Path: Replaces memory state, ejecting the old state ballistically
+        xq.route(.{ .src = .control_in,           .dst = .ps_in.in }),
+        xq.route(.{ .src = .polarity_in.pos,      .dst = .barrier.mem_in }),
+        xq.route(.{ .src = .barrier.eject,  .dst = .ps_out.pos }),
+
+        // Delay Loop (Preserves token energy during asynchronous wait)
+        xq.route(.{ .src = .polarity_in.neg,      .dst = .ps_out.neg, .delay = 10 * xq.ps }),
+        xq.route(.{ .src = .polarity_out.out,     .dst = .C_out }),
+
+        // Data Path: Ballistic evaluation via time-of-flight
+        xq.route(.{ .src = .data_in,           .dst = .circ.in }),
+        xq.route(.{ .src = .circulator.fwd,       .dst = .barrier.filter_in }),
+
+        // Output routing based on Barrier Pass/Reflect
+        xq.route(.{ .src = .barrier.pass,   .dst = .D_out }),
+        xq.route(.{ .src = .barrier.reflect,.dst = .circ.rev }),
+        xq.route(.{ .src = .circulator.drop,      .dst = .Comp_D_out }),
     };
 };
 
-// The Control (d_nodes)
-// The "Active" components that drive the laser and read the result.
 pub fn main() !void {
-    // Synthesize the fabric
-    var chip = try xq.synthesize(XOR_Topology);
+    // Synthesize the spatiotemporal fabric
+    // The compiler automatically calculates path lengths for time-of-flight synchronization
+    var fabric = try xq.synthesize(AsyncSwitchGate, .SuperconductingBARC);
 
-    // "Clamp" inputs (Inject Coherent Light)
-    chip.clamp(.A, 1.0);
-    chip.clamp(.B, 0.0);
+    // Time-of-Flight Execution
+    // Inject quanta (.positive represents magnetic flux orientation or optical phase)
+    fabric.inject(.control_in, .positive);
+    fabric.inject(.data_in, .positive);
 
-    // Wait for light to propagate (Physics happens here)
-    chip.wait(10 * xq.ps);
-
-    // "Observe" the result (Read the Photodetector)
-    // Implicitly handles analog-to-digital thresholding
-    const result = chip.observe(.Output);
+    // Detect the wave-fronts at the sinks
+    // There is no clock. Causality is driven entirely by physical propagation.
+    const results = try fabric.await_settle();
 }
 ```
 
----
+-----
 
 ## Compiler Backends
 
-The `xotiq` toolchain uses a multi-stage lowering strategy to target increasing levels of physical realism.
+The `xotiq` compiler lowers topological flow graphs into physical substrate layouts, verifying thermodynamic reversibility and strict time-of-flight path-matching along the way.
 
-* **Target: Digital Emulation (CPU/FPGA)**
-    * **Output:** SystemVerilog / C++. / etc.
-    * **Method:** `p_nodes` are lowered to pseudo-random number generators and digital accumulators. Allows for rapid algorithm verification on standard hardware.
+  * **Target: Integrated Photonics (Akhetonics RP / SiN platforms)**
 
-* **Target: Analog Synthesis (FPAA/ASIC)**
-    * **Output:** SPICE Netlist.
-    * **Method:** `p_nodes` map to op-amp summing junctions or resistor networks; `d_nodes` map to standard voltage-mode logic.
+      * **Output:** GDSII / Lumerical Interconnects.
+      * **Method:** `f_nodes` are synthesized as precise-length SiN waveguides to ensure wave-fronts collide at exact picosecond intervals. `r_nodes` are lowered to sparse optical crossbars and Semiconductor Optical Amplifiers (SOAs).
+      * **Memory:** Synthesizes functional, immutability-first Read-Write-Once-Read-Many (RWORM) Phase-Change Material (PCM) blocks, side-stepping the need for volatile latch states.
 
-* **Target: Integrated Photonics**
-    * **Output:** GDSII / Circuit Simulation Interconnects.
-    * **Method:**
-    * **WDM Support:** Topological links are assigned specific wavelengths ("colors"), enabling massive parallelism on single waveguides.
-    * **Non-Linearity:** `d_node` logic is synthesized as resonator/SOA structures for signal restoration.
-    * **Interference:** `p_node` meshes are synthesized as passive optical linear units.
+  * **Target: Ballistic Superconducting (Sandia BARC / RSFQ / LJJ)**
 
----
+      * **Output:** Superconducting SPICE / Inductance Networks / GDSII.
+      * **Method:** Lowers `r_nodes` into Long Josephson Junction (LJJ) networks. Synthesizes *Circulators* and *Polarity Selectors*. State is handled via Reversible Memory Cells that safely "eject" stored flux quanta into secondary delay loops to avoid Landauer heat generation.
 
-## Contributing
+  * **Target: Reversible Emulation (CPU/FPGA)**
 
-`xotiq` is an open effort to build the standard infrastructure for post-Von-Neumann computing.
-Core development focuses on the **Intermediate Representation (IR)** and the **Zig-based reference compiler**.
+      * **Output:** SystemVerilog / C++.
+      * **Method:** Validates Spatiotemporal Graphs using high-fidelity time-domain simulation. The compiler verifies that signal fronts arrive at barriers simultaneously and that input entropy strictly matches output entropy (ensuring Landauer compliance) prior to tape-out.
 
-* **Logic Designers:** Help define standard libraries for probabilistic arithmetic.
-* **Physicists:** Help refine the backend models for specific photonic and spintronic constraints.
-* **Compiler Engineers:** Help optimize the lowering passes for hybrid FPGA/ASIC targets.
-
----
+-----
 
 ## Inspiration & Citations
 
-`xotiq` is synthesizing concepts from quantum mechanics, thermodynamics, and high-performance computing.
+`xotiq` synthesizes leading breakthroughs from thermodynamics, quantum mechanics, and continuous-flow physics.
 
-### Foundations
+### Target Architectures & Substrates
 
-* [Simulating Physics with Computers](https://link.springer.com/article/10.1007/BF02650179) (1981)
-> Richard Feynman. The foundational argument for why nature cannot be efficiently simulated by classical boolean logic.
+  * **[Ballistic Superconducting Circuit for Asynchronous Reversible Logic Element](https://ppubs.uspto.gov/api/pdf/downloadPdf/12620993)** (Sandia National Labs, US Patent 12,620,993 B1, 2026)
+    > The definitive architectural blueprint for using magnetic flux quanta (fluxons) to achieve zero-dissipation logic via controlled barriers, circulators, and reversible memory cells that safely eject state.
+  * **[An All-Optical General-Purpose CPU and Optical Computer Architecture](https://arxiv.org/abs/2403.00045)** (Akhetonics, 2024)
+    > Defines the "time-of-flight" computing framework, demonstrating that single-cycle, continuous, clockless data propagation can simulate Turing-complete RISC architectures all-optically, eliminating electro-optical conversion bottlenecks.
 
-* [Minds, Brains, and Programs](https://home.csulb.edu/~cwallis/382/readings/482/searle.minds.brains.programs.bbs.1980.pdf) (1980)
-> Crucial for understanding the distinction between *syntactic* manipulation (traditional computing) and *semantic* understanding (physical settling).
+### Foundations of Reversible Computing
 
-### **Architecture & Hardware**
+  * **[Logical Reversibility of Computation](https://dl.acm.org/doi/10.1147/rd.176.0525)** (C.H. Bennett, 1973)
+    > The mathematical proof that computation can be performed without energy dissipation if it is logically reversible, providing the escape velocity from Landauer's limit.
+  * **[Fundamental Physics of Reversible Computing](https://cra.org/ccc/wp-content/uploads/sites/2/2020/10/CCC-Frank-Day1-v2.pdf)** (M.P. Frank, 2020)
+    > Outlines the physical requirements for abandoning von Neumann irreversible logic to scale computing beyond the limits of current CMOS thermodynamics.
+  * **[Can Programming Be Liberated from the von Neumann Style?](https://dl.acm.org/doi/10.1145/359576.359579)** (John Backus, 1978)
+    > The Turing Award lecture establishing the necessity of functional, side-effect-free programming models—the exact software paradigm required for interfacing with non-volatile, reversible physical fabrics.
 
-* [All-Optical Digital Computing Using a Single All-Optical Gate Type](https://arxiv.org/abs/2403.00045) (2024)
-> The architectural proof-of-concept from Akhetonics, demonstrating how non-linear optical gates (SOAs) can form the universal "NAND/NOR" logic required for deterministic control.
+-----
 
-* [Extropic: An Efficient Probabilistic Hardware Architecture for Diffusion-like Models](https://arxiv.org/abs/2510.23972) (2025)
-> Demonstrates the viability of energy-based probabilistic hardware for modern AI workloads.
-
-* [Massively Parallel Probabilistic Computing with Sparse Ising Machines](https://arxiv.org/abs/2110.02481) (2021)
-> Validates the "Ising Machine" approach (a core `p_node` behavior) for solving combinatorial optimization.
-
-* [Anatomy of High-Performance Matrix Multiplication](https://dl.acm.org/doi/10.1145/1356052.1356053) (2008)
-> The "Bible" of classical matrix math optimization; a reminder of the deterministic bottlenecks we aim to bypass.
-
-* [Field Free Spin-Orbit Torque Controlled Neuron Devices for Spintronic Boltzmann Neural Networks](https://arxiv.org/abs/2510.05616) (2025)
-> A direct physical candidate for the spintronic implementation of `p_nodes`.
-
-### **Theory & Logic**
-
-* [Information Physics of Intelligence: Unifying Logical Depth and Entropy under Thermodynamic Constraints](https://arxiv.org/abs/2511.19156) (2025)
-> Provides the thermodynamic framework for treating computation as energy minimization.
-
-* [Computing with Time: Microarchitectural Weird Machines](https://dl.acm.org/doi/10.1145/3610722)  (2024)
-> Explores the use of analog timing and "settling" as a computational primitive, directly relevant to `xotiq`'s `wait()` and `observe()` semantics.
-
-* [Inconsistency Robustness in Logic Programming](https://arxiv.org/abs/0904.3036) (2009)
-> Essential reading for designing control logic (`d_nodes`) that can tolerate the inherent noise of physical fabrics.
-
-* [Spacetime Hopfions from Skyrmion Braiding](https://arxiv.org/abs/2305.07589) (2023)
-> Sometimes, (maybe always?), state is just topology.
-
----
 *© 02026 Wilson Bilkovich*
