@@ -2,7 +2,7 @@
 
 > (pronounced "exotic")
 
-**The Synthesis Toolchain for Clockless and Reversible Computing.**
+**A Synthesis Toolchain for Clockless and Reversible Computing.**
 
 `xotiq` is an open-source Hardware Description Language (HDL) and compiler infrastructure for the post-von-Neumann omputing era.
 
