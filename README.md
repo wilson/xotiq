@@ -77,22 +77,22 @@ pub const AsyncSwitchGate = struct {
         // Paths must be explicitly defined, and flight times are delay-matched automatically.
 
         // Control Path: Replaces memory state, ejecting the old state ballistically
-        xq.route(.{ .src = .control_in,           .dst = .ps_in.in }),
+        xq.route(.{ .src = .control_in,           .dst = .polarity_in.in }),
         xq.route(.{ .src = .polarity_in.pos,      .dst = .barrier.mem_in }),
-        xq.route(.{ .src = .barrier.eject,  .dst = .ps_out.pos }),
+        xq.route(.{ .src = .barrier.eject,  .dst = .polarity_out.pos }),
 
         // Delay Loop (Preserves token energy during asynchronous wait)
-        xq.route(.{ .src = .polarity_in.neg,      .dst = .ps_out.neg, .delay = 10 * xq.ps }),
-        xq.route(.{ .src = .polarity_out.out,     .dst = .C_out }),
+        xq.route(.{ .src = .polarity_in.neg,      .dst = .polarity_out.neg, .delay = 10 * xq.ps }),
+        xq.route(.{ .src = .polarity_out.out,     .dst = .control_out }),
 
         // Data Path: Ballistic evaluation via time-of-flight
         xq.route(.{ .src = .data_in,           .dst = .circ.in }),
         xq.route(.{ .src = .circulator.fwd,       .dst = .barrier.filter_in }),
 
         // Output routing based on Barrier Pass/Reflect
-        xq.route(.{ .src = .barrier.pass,   .dst = .D_out }),
+        xq.route(.{ .src = .barrier.pass,   .dst = .data_out }),
         xq.route(.{ .src = .barrier.reflect,.dst = .circ.rev }),
-        xq.route(.{ .src = .circulator.drop,      .dst = .Comp_D_out }),
+        xq.route(.{ .src = .circulator.drop,      .dst = .compensation_out }),
     };
 };
 
